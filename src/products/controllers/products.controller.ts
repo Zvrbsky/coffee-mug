@@ -1,18 +1,23 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
-import { ApiBadRequestResponse, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { ApiBadRequestResponse, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AddProductDto } from '../dto/add-product.dto';
 import { mapAddProductDtoToCommand } from '../mappers/product.mapper';
 import { Product, ProductView } from '../db/product.schema';
+import { GetProductsQuery } from '../query/get-products.query';
 
 @ApiTags('products')
 @Controller('products')
 export class ProductsController {
-  constructor(private commandBus: CommandBus) {}
+  constructor(
+    private commandBus: CommandBus,
+    private queryBus: QueryBus,
+  ) {}
 
   @Get()
-  getProducts(): string {
-    return ''
+  @ApiOkResponse({type: ProductView, isArray: true})
+  async getProducts(): Promise<Product[]> {
+    return await this.queryBus.execute(new GetProductsQuery());
   }
 
   @Post()

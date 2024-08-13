@@ -11,8 +11,6 @@ export class AddProductHandler implements ICommandHandler<AddProductCommand> {
   async execute(command: AddProductCommand): Promise<Product> {
     const createdProduct = new this.productModel(command);
 
-    console.log(createdProduct);
-
     return await createdProduct.save();
   }
 }
