@@ -20,14 +20,14 @@ export class ProductsController {
   @Get()
   @ApiOkResponse({type: ProductView, isArray: true})
   async getProducts(): Promise<Product[]> {
-    return await this.queryBus.execute(new GetProductsQuery());
+    return this.queryBus.execute(new GetProductsQuery());
   }
 
   @Post()
   @ApiCreatedResponse({type: ProductView})
   @ApiBadRequestResponse()
   async addProduct(@Body() addProductDto: AddProductDto): Promise<Product> {
-    return await this.commandBus.execute(mapAddProductDtoToCommand(addProductDto));
+    return this.commandBus.execute(mapAddProductDtoToCommand(addProductDto));
   }
 
   @Post(':id/restock')
@@ -35,7 +35,7 @@ export class ProductsController {
   @ApiNotFoundResponse()
   @ApiBadRequestResponse()
   async restockProduct(@Param() params: ProductIdDto, @Body() body: StockDto): Promise<void> {
-    return await this.commandBus.execute(new ModifyStockCommand(params.id, body.amount));
+    return (await this.commandBus.execute(new ModifyStockCommand([{id: params.id, amount: body.amount}])))[0];
   }
 
   @Post(':id/sell')
@@ -43,6 +43,6 @@ export class ProductsController {
   @ApiNotFoundResponse()
   @ApiBadRequestResponse()
   async sellProduct(@Param() params: ProductIdDto, @Body() body: StockDto): Promise<void> {
-    return await this.commandBus.execute(new ModifyStockCommand(params.id, -body.amount));
+    return (await this.commandBus.execute(new ModifyStockCommand([{id: params.id, amount: -body.amount}])))[0];
   }
 }

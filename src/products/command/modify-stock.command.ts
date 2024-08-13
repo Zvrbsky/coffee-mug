@@ -1,6 +1,8 @@
 export class ModifyStockCommand {
   constructor(
-    public readonly id: string,
-    public readonly amount: number,
+    public readonly products: {
+      id: string,
+      amount: number,
+    }[]
   ) {}
 }

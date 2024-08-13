@@ -9,19 +9,23 @@ import { BadRequestException, NotFoundException } from "@nestjs/common";
 export class ModifyStockHandler implements ICommandHandler<ModifyStockCommand> {
     constructor(@InjectModel(Product.name) private productModel: Model<Product>) {}
 
-  async execute(command: ModifyStockCommand): Promise<Product> {
-    const product = await this.productModel.findById(command.id);
+  async execute(command: ModifyStockCommand): Promise<Product[]> {
+    const productsToSave = await Promise.all(command.products.map(async ({id, amount}) => {
+      const product = await this.productModel.findById(id);
 
     if (!product) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException(`Product with id ${id} not found`);
     }
 
-    if (product.stock + command.amount < 0){
-      throw new BadRequestException('Product not available');
+    if (product.stock + amount < 0){
+      throw new BadRequestException(`Product with id ${id} not available`);
     }
 
-    product.stock += command.amount;
+    product.stock += amount;
+    
+    return product;
+    }))
 
-    return await product.save();
+    return Promise.all(productsToSave.map((product) => product.save()));
   }
 }

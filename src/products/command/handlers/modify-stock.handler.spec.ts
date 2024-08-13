@@ -34,14 +34,14 @@ describe('ModifyStockHandler', () => {
     it('should throw if product not found ', async () => {
       jest.spyOn(productModel, 'findById').mockResolvedValue(undefined);
       
-      await expect(modifyStockHandler.execute({id: 'a', amount: 1})).rejects.toThrow(NotFoundException);
+      await expect(modifyStockHandler.execute({products: [{id: 'a', amount: 1}]})).rejects.toThrow(NotFoundException);
       expect(productModel.findById).toHaveBeenCalledTimes(1);
     });
 
     it('should throw if after operation amount will be less then 0 ', async () => {
       jest.spyOn(productModel, 'findById').mockResolvedValue({stock: 1} as any);
       
-      await expect(modifyStockHandler.execute({id: 'a', amount: -2})).rejects.toThrow(BadRequestException);
+      await expect(modifyStockHandler.execute({products: [{id: 'a', amount: -2}]})).rejects.toThrow(BadRequestException);
       expect(productModel.findById).toHaveBeenCalledTimes(1);
     });
 
@@ -57,9 +57,9 @@ describe('ModifyStockHandler', () => {
 
       jest.spyOn(productModel, 'findById').mockResolvedValue(product);
       
-      const result = await modifyStockHandler.execute({id: 'a', amount: 1});
+      const result = await modifyStockHandler.execute({products: [{id: 'a', amount: 1}]});
 
-      expect(result.stock).toEqual(3);
+      expect(result[0].stock).toEqual(3);
       expect(productModel.findById).toHaveBeenCalledTimes(1);
     });
   })
