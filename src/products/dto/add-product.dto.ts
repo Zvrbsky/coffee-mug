@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsPositive, IsString, MaxLength } from "class-validator";
+import { IsInt, IsNumber, IsPositive, IsString, MaxLength } from "class-validator";
 
 export class AddProductDto {
 
@@ -20,6 +20,7 @@ export class AddProductDto {
 
   @ApiProperty({description: 'No of available products'})
   @IsNumber()
+  @IsInt()
   @IsPositive()
   public stock: number;
 }
